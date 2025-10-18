@@ -51,12 +51,15 @@ const app: Express = express();
 // ========================================
 // CONFIGURAÇÃO DE PROXY (para produção e desenvolvimento)
 // ========================================
-// Em produção, confia no proxy para rate-limit funcionar corretamente
-app.set('trust proxy', true);
+// Configuração segura do trust proxy
 if (process.env.NODE_ENV === 'development') {
-  console.log('🔧 Modo desenvolvimento: proxy confiável ativado para ngrok');
+  // Em desenvolvimento, confia apenas no primeiro proxy (ngrok)
+  app.set('trust proxy', 1);
+  console.log('🔧 Modo desenvolvimento: proxy confiável limitado ativado para ngrok');
 } else {
-  console.log('🔧 Modo produção: proxy confiável ativado para rate-limit');
+  // Em produção, configura proxy de forma mais segura
+  app.set('trust proxy', process.env.TRUST_PROXY || 1);
+  console.log('🔧 Modo produção: proxy confiável configurado de forma segura');
 }
 
 // ========================================
