@@ -649,10 +649,10 @@ app.post("/webhook/ghl",
         // Enviar mensagem via Evolution API
         console.log(`🔄 Enviando mensagem com messageId: ${req.body.messageId}`);
         const result = await dynamicIntegrationService.sendMessageToWhatsApp(
-          phoneNumber,
-          message,
-          locationId,
-          req.body.messageId
+          locationId,        // ✅ CORREÇÃO: resourceId (locationId)
+          contactId,         // ✅ CORREÇÃO: contactId
+          message,          // ✅ CORREÇÃO: message
+          req.body.messageId // ✅ CORREÇÃO: messageId
         );
         
         if (result.success) {
