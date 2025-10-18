@@ -184,6 +184,14 @@ export class IntegrationService {
     messageId?: string
   ): Promise<SyncResult> {
     try {
+      console.log(`📤 === INTEGRATION SERVICE - ENVIANDO MENSAGEM ===`);
+      console.log(`📤 resourceId: ${resourceId}`);
+      console.log(`📤 contactId: ${contactId}`);
+      console.log(`📤 message: ${message}`);
+      console.log(`📤 messageId: ${messageId}`);
+      console.log(`📤 Timestamp: ${new Date().toISOString()}`);
+      console.log(`📤 === FIM PARÂMETROS ===`);
+      
       console.log(`=== INÍCIO DO ENVIO DE MENSAGEM WHATSAPP ===`);
       console.log(`Enviando mensagem para WhatsApp via recurso: ${resourceId}`);
       console.log(`Contact ID: ${contactId}`);

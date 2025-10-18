@@ -486,6 +486,18 @@ app.post("/webhook/ghl",
       console.log("🚨 Se você vê esta mensagem, a versão atualizada está rodando!");
       console.log("🚨 === FIM VERIFICAÇÃO ===");
       
+      // LOGS DETALHADOS DE CADA CAMPO
+      console.log("📋 === ANÁLISE DETALHADA DO WEBHOOK ===");
+      console.log("📋 Event Type:", req.body.type);
+      console.log("📋 Location ID:", req.body.locationId);
+      console.log("📋 Company ID:", req.body.companyId);
+      console.log("📋 Message ID:", req.body.messageId);
+      console.log("📋 Contact ID:", req.body.contactId);
+      console.log("📋 Direction:", req.body.direction);
+      console.log("📋 Source:", req.body.source);
+      console.log("📋 Body:", req.body.body);
+      console.log("📋 === FIM ANÁLISE DETALHADA ===");
+      
       const eventType = req.body.type;
       const { locationId, companyId, messageId } = req.body;
       
@@ -574,6 +586,7 @@ app.post("/webhook/ghl",
     } else if (eventType === 'OutboundMessage') {
       console.log("📤 === EVENTO OUTBOUNDMESSAGE DETECTADO ===");
       console.log("📤 Processando mensagem outbound...");
+      console.log("📤 Timestamp do evento:", new Date().toISOString());
       
       // Extrair dados essenciais
       const { conversationProviderId, locationId, contactId, body: message, direction, source } = req.body;
@@ -588,6 +601,14 @@ app.post("/webhook/ghl",
       console.log("📋 source:", source);
       console.log("📋 conversationProviderId:", conversationProviderId);
       console.log("📋 === FIM PAYLOAD ===");
+      
+      // LOGS DETALHADOS DE CADA ETAPA
+      console.log("🔄 === INICIANDO PROCESSAMENTO OUTBOUND ===");
+      console.log("🔄 Etapa 1: Verificando dados essenciais...");
+      console.log("🔄 LocationId válido:", !!locationId);
+      console.log("🔄 ContactId válido:", !!contactId);
+      console.log("🔄 Message válida:", !!message);
+      console.log("🔄 === FIM VERIFICAÇÃO DADOS ===");
       
       // Verificações anti-loop
       if (direction === 'inbound') {
@@ -690,7 +711,19 @@ app.post("/webhook/ghl",
         console.log(`🔄 contactId: ${contactId}`);
         console.log(`🔄 message: ${message}`);
         console.log(`🔄 instanceName: ${dynamicConfig.defaultInstanceName}`);
+        console.log(`🔄 Timestamp: ${new Date().toISOString()}`);
         console.log(`🔄 === CHAMANDO sendMessageToWhatsApp ===`);
+        
+        // LOGS DETALHADOS ANTES DO ENVIO
+        console.log("📤 === PREPARANDO ENVIO EVOLUTION API ===");
+        console.log("📤 Parâmetros finais:", {
+          locationId,
+          contactId,
+          message,
+          messageId: req.body.messageId,
+          instanceName: dynamicConfig.defaultInstanceName
+        });
+        console.log("📤 === INICIANDO CHAMADA ===");
         
         const result = await dynamicIntegrationService.sendMessageToWhatsApp(
           locationId,        // ✅ CORREÇÃO: resourceId (locationId)
@@ -704,6 +737,7 @@ app.post("/webhook/ghl",
         console.log(`📤 Mensagem:`, result.message);
         console.log(`📤 Erro:`, result.error);
         console.log(`📤 Dados:`, JSON.stringify(result.data, null, 2));
+        console.log(`📤 Timestamp resultado: ${new Date().toISOString()}`);
         console.log(`📤 === FIM RESULTADO ===`);
         
         if (result.success) {
@@ -1818,8 +1852,13 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 app.listen(port, () => {
-  console.log(`GHL Integration App listening on port ${port}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`Evolution API URL: ${baseIntegrationConfig.evolutionApiUrl}`);
-  console.log('🚨 Aplicação iniciada com proteção contra SIGTERM');
+  console.log(`🚀 === APLICAÇÃO INICIADA ===`);
+  console.log(`🚀 Porta: ${port}`);
+  console.log(`🚀 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🚀 Evolution API URL: ${baseIntegrationConfig.evolutionApiUrl}`);
+  console.log(`🚀 Trust Proxy: ${app.get('trust proxy')}`);
+  console.log(`🚀 Rate Limiting: ${process.env.FORCE_DISABLE_RATE_LIMIT === 'true' ? 'DESABILITADO' : 'ATIVO'}`);
+  console.log(`🚀 Timestamp: ${new Date().toISOString()}`);
+  console.log(`🚨 Aplicação iniciada com proteção contra SIGTERM`);
+  console.log(`🚀 === FIM LOGS INICIAIS ===`);
 });// Production deploy - Wed, Aug 20, 2025  6:22:40 PM

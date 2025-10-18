@@ -69,6 +69,8 @@ export class EvolutionApiService {
       console.log(`🔧 Instância:`, this.config.instanceName);
       console.log(`🌐 URL base:`, this.axiosInstance.defaults.baseURL);
       console.log(`🔑 API Key:`, this.config.apiKey ? 'CONFIGURADA' : 'NÃO CONFIGURADA');
+      console.log(`⏰ Timestamp:`, new Date().toISOString());
+      console.log(`📤 === FIM CONFIGURAÇÃO ===`);
       
       // Remove o + e adiciona @s.whatsapp.net
       const formattedPhone = phoneNumber.replace('+', '') + '@s.whatsapp.net';
