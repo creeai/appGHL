@@ -239,12 +239,16 @@ export class IntegrationService {
 
       // Envia a mensagem
       console.log(`Enviando mensagem via Evolution API para: ${contactInfo.data.phone}`);
+      console.log(`📞 Telefone do contato:`, contactInfo.data.phone);
+      console.log(`💬 Mensagem a ser enviada:`, message);
+      console.log(`🔧 Instância Evolution:`, instanceName);
+      
       const sendResult = await evolutionService.sendTextMessage(
         contactInfo.data.phone,
         message
       );
       
-      console.log(`Resultado do envio Evolution API:`, sendResult);
+      console.log(`✅ Resultado do envio Evolution API:`, JSON.stringify(sendResult, null, 2));
 
       if (sendResult.success) {
         // Atualiza status da mensagem para "delivered" no GHL se messageId foi fornecido
@@ -280,15 +284,19 @@ export class IntegrationService {
           data: sendResult.data
         };
       } else {
+        console.error('❌ Falha ao enviar mensagem via Evolution API:', sendResult.error);
         return {
           success: false,
-          message: 'Falha ao enviar mensagem',
-          error: sendResult.error
+          message: 'Falha ao enviar mensagem via Evolution API',
+          error: sendResult.error || 'Erro desconhecido'
         };
       }
 
     } catch (error: unknown) {
-      console.error('Erro ao enviar mensagem para WhatsApp:', error);
+      console.error('❌ Erro ao enviar mensagem para WhatsApp:', error);
+      if (error instanceof Error) {
+        console.error('❌ Stack trace:', error.stack);
+      }
       return {
         success: false,
         message: 'Erro ao enviar mensagem para WhatsApp',
