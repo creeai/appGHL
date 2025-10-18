@@ -136,9 +136,16 @@ export class EvolutionApiService {
       
       // Logs de status simplificados
       console.log('Status da instância:', response.data.state);
+      console.log('Resposta completa:', JSON.stringify(response.data, null, 2));
+      
+      // Se não tem state, mas a resposta existe, considera válida
+      if (!response.data.state && response.data) {
+        console.log('✅ Instância existe mas sem state definido - considerando válida');
+        return true;
+      }
       
       // Aceita diferentes status que indicam que a instância está funcionando
-      const validStates = ['open', 'connecting', 'connected'];
+      const validStates = ['open', 'connecting', 'connected', 'ready', 'authenticated'];
       const isValidState = validStates.includes(response.data.state);
       
       console.log(`Status '${response.data.state}' é válido: ${isValidState}`);
@@ -146,6 +153,7 @@ export class EvolutionApiService {
       return isValidState;
     } catch (error: any) {
       console.error('Erro ao verificar status da instância:', error);
+      console.error('Detalhes do erro:', error.response?.data || error.message);
       return false;
     }
   }
@@ -239,6 +247,20 @@ export class EvolutionApiService {
    */
   async createInstance(): Promise<EvolutionMessageResponse> {
     try {
+      // Primeiro verifica se a instância já existe
+      const statusResponse = await this.axiosInstance.get(
+        `/instance/connectionState/${this.config.instanceName}`
+      );
+      
+      if (statusResponse.data && statusResponse.data.state) {
+        console.log(`✅ Instância ${this.config.instanceName} já existe com status: ${statusResponse.data.state}`);
+        return {
+          success: true,
+          data: { message: 'Instância já existe', state: statusResponse.data.state }
+        };
+      }
+      
+      // Se não existe, cria nova instância
       const response: AxiosResponse = await this.axiosInstance.post(
         `/instance/create`,
         {
@@ -258,6 +280,17 @@ export class EvolutionApiService {
       };
     } catch (error: any) {
       console.error('Erro ao criar instância:', error);
+      
+      // Se o erro é que a instância já existe, considera sucesso
+      if (error.response?.status === 403 && 
+          error.response?.data?.message?.includes('already in use')) {
+        console.log(`✅ Instância ${this.config.instanceName} já existe - considerando sucesso`);
+        return {
+          success: true,
+          data: { message: 'Instância já existe', state: 'existing' }
+        };
+      }
+      
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Erro desconhecido'
