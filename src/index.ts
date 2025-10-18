@@ -471,6 +471,11 @@ app.post("/webhook/ghl",
   ghlCredentialsValidator.validateGHLWebhook, // Valida credenciais GHL do banco
   async (req: Request, res: Response) => {
       try {
+      // LOGS CRÍTICOS QUE APARECEM SEMPRE
+      console.log(`🔥 === WEBHOOK GHL CHAMADO ===`);
+      console.log(`🔥 Timestamp: ${new Date().toISOString()}`);
+      console.log(`🔥 Se você vê esta mensagem, o webhook está funcionando!`);
+      console.log(`🔥 === FIM LOGS CRÍTICOS WEBHOOK ===`);
       // LOGS DETALHADOS PARA DEBUG
       console.log("🔔 === WEBHOOK GHL RECEBIDO ===");
       console.log("🔔 Timestamp:", new Date().toISOString());
@@ -584,6 +589,12 @@ app.post("/webhook/ghl",
         console.log("⚠️ INSTALL sem locationId - não é possível configurar integração");
       }
     } else if (eventType === 'OutboundMessage') {
+      // LOGS CRÍTICOS QUE APARECEM SEMPRE
+      console.log(`🔥 === OUTBOUNDMESSAGE DETECTADO ===`);
+      console.log(`🔥 Se você vê esta mensagem, o evento OutboundMessage está funcionando!`);
+      console.log(`🔥 Timestamp: ${new Date().toISOString()}`);
+      console.log(`🔥 === FIM LOGS CRÍTICOS OUTBOUND ===`);
+      
       console.log("📤 === EVENTO OUTBOUNDMESSAGE DETECTADO ===");
       console.log("📤 Processando mensagem outbound...");
       console.log("📤 Timestamp do evento:", new Date().toISOString());
@@ -1861,4 +1872,10 @@ app.listen(port, () => {
   console.log(`🚀 Timestamp: ${new Date().toISOString()}`);
   console.log(`🚨 Aplicação iniciada com proteção contra SIGTERM`);
   console.log(`🚀 === FIM LOGS INICIAIS ===`);
+  
+  // LOGS CRÍTICOS QUE APARECEM SEMPRE
+  console.log(`🔥 === LOGS CRÍTICOS ATIVADOS ===`);
+  console.log(`🔥 Se você vê esta mensagem, a versão com logs detalhados está rodando!`);
+  console.log(`🔥 Timestamp crítico: ${new Date().toISOString()}`);
+  console.log(`🔥 === FIM LOGS CRÍTICOS ===`);
 });// Production deploy - Wed, Aug 20, 2025  6:22:40 PM
