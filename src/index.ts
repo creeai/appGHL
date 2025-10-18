@@ -751,7 +751,15 @@ app.post("/webhook/ghl",
           error: error.message
         });
       }
-  } else {
+  } else if (eventType === 'InboundMessage') {
+      console.log("📥 Evento InboundMessage detectado - mensagem recebida");
+      console.log("📥 Esta é uma mensagem que o usuário ENVIOU para o GHL");
+      console.log("📥 Não precisamos processar - apenas log para debug");
+      return res.status(200).json({ 
+        success: true, 
+        message: "Mensagem inbound recebida - não processada" 
+      });
+    } else {
       console.log(`❓ Tipo de evento não suportado: ${eventType}`);
     }
     
