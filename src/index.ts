@@ -67,6 +67,11 @@ if (process.env.DISABLE_RATE_LIMIT === 'true') {
   console.log('⚠️ Rate limiting desabilitado por configuração');
 }
 
+// CORREÇÃO CRÍTICA: Desabilitar rate limiting completamente se necessário
+if (process.env.FORCE_DISABLE_RATE_LIMIT === 'true') {
+  console.log('🚨 Rate limiting FORÇADAMENTE desabilitado para evitar SIGTERM');
+}
+
 // ========================================
 // MIDDLEWARE DE SEGURANÇA
 // ========================================
@@ -78,7 +83,9 @@ app.use(securityHeaders);
 app.use(cors(corsOptions));
 
 // Rate limiting global - CORREÇÃO PARA PRODUÇÃO
-if (process.env.DISABLE_RATE_LIMIT !== 'true') {
+if (process.env.FORCE_DISABLE_RATE_LIMIT === 'true') {
+  console.log('🚨 Rate limiting COMPLETAMENTE desabilitado para evitar SIGTERM');
+} else if (process.env.DISABLE_RATE_LIMIT !== 'true') {
   app.use(rateLimiter);
 } else {
   console.log('⚠️ Rate limiting desabilitado - usando apenas para webhooks');
@@ -1788,8 +1795,31 @@ app.use((error: any, req: Request, res: Response, next: NextFunction) => {
   }
 });
 
+// Tratamento de sinais para evitar SIGTERM
+process.on('SIGTERM', () => {
+  console.log('🚨 SIGTERM recebido - encerrando graciosamente...');
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('🚨 SIGINT recebido - encerrando graciosamente...');
+  process.exit(0);
+});
+
+// Tratamento de erros não capturados
+process.on('uncaughtException', (error) => {
+  console.error('🚨 Erro não capturado:', error);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('🚨 Promise rejeitada não tratada:', reason);
+  process.exit(1);
+});
+
 app.listen(port, () => {
   console.log(`GHL Integration App listening on port ${port}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`Evolution API URL: ${baseIntegrationConfig.evolutionApiUrl}`);
+  console.log('🚨 Aplicação iniciada com proteção contra SIGTERM');
 });// Production deploy - Wed, Aug 20, 2025  6:22:40 PM
