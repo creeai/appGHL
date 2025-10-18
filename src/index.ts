@@ -813,6 +813,14 @@ app.post("/webhook/ghl",
       console.log("📥 Esta é uma mensagem que o usuário ENVIOU para o GHL");
       console.log("📥 Não precisamos processar - apenas log para debug");
       console.log("📥 Payload completo:", JSON.stringify(req.body, null, 2));
+      
+      // LOG CRÍTICO PARA DEBUG
+      console.log("🚨 === IMPORTANTE ===");
+      console.log("🚨 Para testar o envio, você precisa ENVIAR uma mensagem do GHL");
+      console.log("🚨 Não apenas receber mensagens do usuário");
+      console.log("🚨 Vá no GHL e ENVIE uma mensagem para o WhatsApp");
+      console.log("🚨 === FIM IMPORTANTE ===");
+      
       return res.status(200).json({ 
         success: true, 
         message: "Mensagem inbound recebida - não processada" 
