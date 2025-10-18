@@ -51,7 +51,7 @@ const app: Express = express();
 // ========================================
 // CONFIGURAÇÃO DE PROXY (para produção e desenvolvimento)
 // ========================================
-// Configuração segura do trust proxy
+// Configuração segura do trust proxy - CORREÇÃO DEFINITIVA
 if (process.env.NODE_ENV === 'development') {
   // Em desenvolvimento, confia apenas no primeiro proxy (ngrok)
   app.set('trust proxy', 1);
@@ -60,6 +60,11 @@ if (process.env.NODE_ENV === 'development') {
   // Em produção, configura proxy de forma mais segura
   app.set('trust proxy', process.env.TRUST_PROXY || 1);
   console.log('🔧 Modo produção: proxy confiável configurado de forma segura');
+}
+
+// CORREÇÃO ADICIONAL: Desabilitar rate limiting se trust proxy estiver causando problemas
+if (process.env.DISABLE_RATE_LIMIT === 'true') {
+  console.log('⚠️ Rate limiting desabilitado por configuração');
 }
 
 // ========================================
@@ -72,8 +77,13 @@ app.use(securityHeaders);
 // CORS restritivo
 app.use(cors(corsOptions));
 
-// Rate limiting global
-app.use(rateLimiter);
+// Rate limiting global - CORREÇÃO PARA PRODUÇÃO
+if (process.env.DISABLE_RATE_LIMIT !== 'true') {
+  app.use(rateLimiter);
+} else {
+  console.log('⚠️ Rate limiting desabilitado - usando apenas para webhooks');
+  app.use('/webhook', webhookRateLimiter);
+}
 
 // Validação de tamanho de payload
 app.use(validatePayloadSize);
@@ -454,6 +464,16 @@ app.post("/webhook/ghl",
   ghlCredentialsValidator.validateGHLWebhook, // Valida credenciais GHL do banco
   async (req: Request, res: Response) => {
       try {
+      // LOGS DETALHADOS PARA DEBUG
+      console.log("🔔 === WEBHOOK GHL RECEBIDO ===");
+      console.log("🔔 Timestamp:", new Date().toISOString());
+      console.log("🔔 IP:", req.ip);
+      console.log("🔔 User-Agent:", req.headers['user-agent']);
+      console.log("🔔 Content-Type:", req.headers['content-type']);
+      console.log("🔔 Headers completos:", JSON.stringify(req.headers, null, 2));
+      console.log("🔔 Body completo:", JSON.stringify(req.body, null, 2));
+      console.log("🔔 === FIM LOGS WEBHOOK ===");
+      
       const eventType = req.body.type;
       const { locationId, companyId, messageId } = req.body;
       
@@ -540,20 +560,22 @@ app.post("/webhook/ghl",
         console.log("⚠️ INSTALL sem locationId - não é possível configurar integração");
       }
     } else if (eventType === 'OutboundMessage') {
-      console.log("📤 Evento OutboundMessage detectado - processando mensagem...");
+      console.log("📤 === EVENTO OUTBOUNDMESSAGE DETECTADO ===");
+      console.log("📤 Processando mensagem outbound...");
       
       // Extrair dados essenciais
       const { conversationProviderId, locationId, contactId, body: message, direction, source } = req.body;
       
       // Logs principais do payload
-      console.log("📋 Payload GHL recebido:", {
-        messageId: req.body.messageId,
-        locationId,
-        contactId,
-        message,
-        direction,
-        source
-      });
+      console.log("📋 === PAYLOAD GHL COMPLETO ===");
+      console.log("📋 messageId:", req.body.messageId);
+      console.log("📋 locationId:", locationId);
+      console.log("📋 contactId:", contactId);
+      console.log("📋 message:", message);
+      console.log("📋 direction:", direction);
+      console.log("📋 source:", source);
+      console.log("📋 conversationProviderId:", conversationProviderId);
+      console.log("📋 === FIM PAYLOAD ===");
       
       // Verificações anti-loop
       if (direction === 'inbound') {
@@ -650,13 +672,13 @@ app.post("/webhook/ghl",
         const dynamicIntegrationService = new IntegrationService(dynamicConfig);
         
         // Enviar mensagem via Evolution API
-        console.log(`🔄 Enviando mensagem com messageId: ${req.body.messageId}`);
-        console.log(`📋 Parâmetros para sendMessageToWhatsApp:`, {
-          locationId,
-          contactId,
-          message,
-          messageId: req.body.messageId
-        });
+        console.log(`🔄 === ENVIANDO MENSAGEM PARA EVOLUTION API ===`);
+        console.log(`🔄 messageId: ${req.body.messageId}`);
+        console.log(`🔄 locationId: ${locationId}`);
+        console.log(`🔄 contactId: ${contactId}`);
+        console.log(`🔄 message: ${message}`);
+        console.log(`🔄 instanceName: ${dynamicConfig.defaultInstanceName}`);
+        console.log(`🔄 === CHAMANDO sendMessageToWhatsApp ===`);
         
         const result = await dynamicIntegrationService.sendMessageToWhatsApp(
           locationId,        // ✅ CORREÇÃO: resourceId (locationId)
@@ -665,7 +687,12 @@ app.post("/webhook/ghl",
           req.body.messageId // ✅ CORREÇÃO: messageId
         );
         
-        console.log(`📤 Resultado do envio:`, JSON.stringify(result, null, 2));
+        console.log(`📤 === RESULTADO DO ENVIO ===`);
+        console.log(`📤 Sucesso:`, result.success);
+        console.log(`📤 Mensagem:`, result.message);
+        console.log(`📤 Erro:`, result.error);
+        console.log(`📤 Dados:`, JSON.stringify(result.data, null, 2));
+        console.log(`📤 === FIM RESULTADO ===`);
         
         if (result.success) {
           console.log("✅ Mensagem enviada com sucesso via Evolution API");
