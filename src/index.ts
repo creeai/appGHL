@@ -651,12 +651,21 @@ app.post("/webhook/ghl",
         
         // Enviar mensagem via Evolution API
         console.log(`🔄 Enviando mensagem com messageId: ${req.body.messageId}`);
+        console.log(`📋 Parâmetros para sendMessageToWhatsApp:`, {
+          locationId,
+          contactId,
+          message,
+          messageId: req.body.messageId
+        });
+        
         const result = await dynamicIntegrationService.sendMessageToWhatsApp(
           locationId,        // ✅ CORREÇÃO: resourceId (locationId)
           contactId,         // ✅ CORREÇÃO: contactId
           message,          // ✅ CORREÇÃO: message
           req.body.messageId // ✅ CORREÇÃO: messageId
         );
+        
+        console.log(`📤 Resultado do envio:`, JSON.stringify(result, null, 2));
         
         if (result.success) {
           console.log("✅ Mensagem enviada com sucesso via Evolution API");

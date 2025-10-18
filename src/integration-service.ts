@@ -238,17 +238,23 @@ export class IntegrationService {
       });
 
       // Envia a mensagem
-      console.log(`Enviando mensagem via Evolution API para: ${contactInfo.data.phone}`);
+      console.log(`📤 === ENVIANDO MENSAGEM PARA EVOLUTION API ===`);
       console.log(`📞 Telefone do contato:`, contactInfo.data.phone);
       console.log(`💬 Mensagem a ser enviada:`, message);
       console.log(`🔧 Instância Evolution:`, instanceName);
+      console.log(`🌐 URL Evolution API:`, this.config.evolutionApiUrl);
+      console.log(`🔑 API Key configurada:`, !!this.config.evolutionApiKey);
       
       const sendResult = await evolutionService.sendTextMessage(
         contactInfo.data.phone,
         message
       );
       
-      console.log(`✅ Resultado do envio Evolution API:`, JSON.stringify(sendResult, null, 2));
+      console.log(`📤 === RESULTADO DO ENVIO EVOLUTION API ===`);
+      console.log(`✅ Sucesso:`, sendResult.success);
+      console.log(`📋 Dados:`, JSON.stringify(sendResult.data, null, 2));
+      console.log(`❌ Erro:`, sendResult.error);
+      console.log(`📤 === FIM RESULTADO ===`);
 
       if (sendResult.success) {
         // Atualiza status da mensagem para "delivered" no GHL se messageId foi fornecido

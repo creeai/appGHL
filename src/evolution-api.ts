@@ -64,23 +64,42 @@ export class EvolutionApiService {
    */
   async sendTextMessage(phoneNumber: string, message: string): Promise<EvolutionMessageResponse> {
     try {
+      console.log(`📤 === EVOLUTION API SENDTEXT ===`);
+      console.log(`📞 Telefone original:`, phoneNumber);
+      console.log(`🔧 Instância:`, this.config.instanceName);
+      console.log(`🌐 URL base:`, this.axiosInstance.defaults.baseURL);
+      console.log(`🔑 API Key:`, this.config.apiKey ? 'CONFIGURADA' : 'NÃO CONFIGURADA');
+      
       // Remove o + e adiciona @s.whatsapp.net
       const formattedPhone = phoneNumber.replace('+', '') + '@s.whatsapp.net';
+      console.log(`📞 Telefone formatado:`, formattedPhone);
       
-      const response: AxiosResponse = await this.axiosInstance.post(
-        `/message/sendText/${this.config.instanceName}`,
-        {
-          number: formattedPhone,
-          text: message
-        }
-      );
+      const payload = {
+        number: formattedPhone,
+        text: message
+      };
+      console.log(`📋 Payload:`, JSON.stringify(payload, null, 2));
+      
+      const url = `/message/sendText/${this.config.instanceName}`;
+      console.log(`🌐 URL completa:`, `${this.axiosInstance.defaults.baseURL}${url}`);
+      
+      const response: AxiosResponse = await this.axiosInstance.post(url, payload);
+      
+      console.log(`✅ Resposta Evolution API:`, JSON.stringify(response.data, null, 2));
 
       return {
         success: true,
         data: response.data
       };
     } catch (error: any) {
-      console.error('Erro ao enviar mensagem via Evolution API:', error);
+      console.error(`❌ === ERRO EVOLUTION API ===`);
+      console.error(`❌ Status:`, error.response?.status);
+      console.error(`❌ Status Text:`, error.response?.statusText);
+      console.error(`❌ Headers:`, error.response?.headers);
+      console.error(`❌ Data:`, JSON.stringify(error.response?.data, null, 2));
+      console.error(`❌ Message:`, error.message);
+      console.error(`❌ === FIM ERRO ===`);
+      
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Erro desconhecido'
