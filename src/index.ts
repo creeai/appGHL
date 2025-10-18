@@ -503,6 +503,12 @@ app.post("/webhook/ghl",
       console.log("📋 Body:", req.body.body);
       console.log("📋 === FIM ANÁLISE DETALHADA ===");
       
+      // LOG CRÍTICO PARA DEBUG
+      console.log("🚨 === DEBUG CRÍTICO ===");
+      console.log("🚨 Se você vê OutboundMessage aqui, o problema está resolvido!");
+      console.log("🚨 Se não vê OutboundMessage, você precisa ENVIAR uma mensagem do GHL");
+      console.log("🚨 === FIM DEBUG CRÍTICO ===");
+      
       const eventType = req.body.type;
       const { locationId, companyId, messageId } = req.body;
       
@@ -594,6 +600,13 @@ app.post("/webhook/ghl",
       console.log(`🔥 Se você vê esta mensagem, o evento OutboundMessage está funcionando!`);
       console.log(`🔥 Timestamp: ${new Date().toISOString()}`);
       console.log(`🔥 === FIM LOGS CRÍTICOS OUTBOUND ===`);
+      
+      // LOG CRÍTICO PARA DEBUG
+      console.log("🚨 === OUTBOUNDMESSAGE CRÍTICO ===");
+      console.log("🚨 EVENTO OUTBOUNDMESSAGE DETECTADO!");
+      console.log("🚨 Esta é a mensagem que você ENVIOU do GHL!");
+      console.log("🚨 Agora vamos processar o envio para Evolution API!");
+      console.log("🚨 === FIM OUTBOUNDMESSAGE CRÍTICO ===");
       
       console.log("📤 === EVENTO OUTBOUNDMESSAGE DETECTADO ===");
       console.log("📤 Processando mensagem outbound...");
