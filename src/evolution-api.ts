@@ -85,9 +85,19 @@ export class EvolutionApiService {
       const url = `/message/sendText/${this.config.instanceName}`;
       console.log(`🌐 URL completa:`, `${this.axiosInstance.defaults.baseURL}${url}`);
       
+      console.log(`📤 === FAZENDO REQUISIÇÃO PARA EVOLUTION API ===`);
+      console.log(`📤 URL: ${url}`);
+      console.log(`📤 Payload:`, JSON.stringify(payload, null, 2));
+      console.log(`📤 Headers:`, JSON.stringify(this.axiosInstance.defaults.headers, null, 2));
+      console.log(`📤 === INICIANDO REQUISIÇÃO ===`);
+      
       const response: AxiosResponse = await this.axiosInstance.post(url, payload);
       
-      console.log(`✅ Resposta Evolution API:`, JSON.stringify(response.data, null, 2));
+      console.log(`📤 === RESPOSTA EVOLUTION API ===`);
+      console.log(`📤 Status: ${response.status}`);
+      console.log(`📤 Headers:`, JSON.stringify(response.headers, null, 2));
+      console.log(`📤 Data:`, JSON.stringify(response.data, null, 2));
+      console.log(`📤 === FIM RESPOSTA ===`);
 
       return {
         success: true,

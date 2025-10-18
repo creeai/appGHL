@@ -199,10 +199,19 @@ export class IntegrationService {
       console.log(`Message ID recebido: ${messageId}`);
       
       // Busca informações da instalação
-      console.log(`Buscando informações da instalação para: ${resourceId}`);
+      console.log(`🔍 === BUSCANDO INFORMAÇÕES DA INSTALAÇÃO ===`);
+      console.log(`🔍 ResourceId: ${resourceId}`);
+      console.log(`🔍 Timestamp: ${new Date().toISOString()}`);
+      
       const installation = await this.model.getInstallationInfo(resourceId);
+      
+      console.log(`🔍 === RESULTADO BUSCA INSTALAÇÃO ===`);
+      console.log(`🔍 Installation encontrada: ${!!installation}`);
+      console.log(`🔍 Dados da instalação:`, JSON.stringify(installation, null, 2));
+      console.log(`🔍 === FIM RESULTADO BUSCA ===`);
+      
       if (!installation) {
-        console.log(`Instalação não encontrada para: ${resourceId}`);
+        console.log(`❌ Instalação não encontrada para: ${resourceId}`);
         return {
           success: false,
           message: 'Instalação não encontrada',
@@ -218,10 +227,21 @@ export class IntegrationService {
       });
 
       // Busca informações do contato no GHL
-      console.log(`Buscando informações do contato no GHL: ${contactId}`);
+      console.log(`🔍 === BUSCANDO INFORMAÇÕES DO CONTATO NO GHL ===`);
+      console.log(`🔍 ContactId: ${contactId}`);
+      console.log(`🔍 ResourceId: ${resourceId}`);
+      console.log(`🔍 Timestamp: ${new Date().toISOString()}`);
+      
       const contactInfo = await this.getGHLContactInfo(resourceId, contactId);
+      
+      console.log(`🔍 === RESULTADO BUSCA CONTATO GHL ===`);
+      console.log(`🔍 Sucesso: ${contactInfo.success}`);
+      console.log(`🔍 Dados do contato:`, JSON.stringify(contactInfo.data, null, 2));
+      console.log(`🔍 Erro: ${contactInfo.error}`);
+      console.log(`🔍 === FIM RESULTADO BUSCA CONTATO GHL ===`);
+      
       if (!contactInfo.success) {
-        console.log(`Falha ao buscar contato:`, contactInfo);
+        console.log(`❌ Falha ao buscar contato:`, contactInfo);
         return contactInfo;
       }
       
@@ -428,9 +448,21 @@ export class IntegrationService {
    */
   private async getGHLContactInfo(resourceId: string, contactId: string): Promise<SyncResult> {
     try {
+      console.log(`🔍 === FUNÇÃO getGHLContactInfo ===`);
+      console.log(`🔍 ResourceId: ${resourceId}`);
+      console.log(`🔍 ContactId: ${contactId}`);
+      console.log(`🔍 URL: /contacts/${contactId}`);
+      console.log(`🔍 Timestamp: ${new Date().toISOString()}`);
+      console.log(`🔍 === FAZENDO REQUISIÇÃO GHL ===`);
+      
       const response = await this.ghl.requests(resourceId).get(`/contacts/${contactId}`, {
         headers: { Version: "2021-04-15" }
       });
+
+      console.log(`🔍 === RESPOSTA GHL CONTATO ===`);
+      console.log(`🔍 Status: ${response.status}`);
+      console.log(`🔍 Dados:`, JSON.stringify(response.data, null, 2));
+      console.log(`🔍 === FIM RESPOSTA GHL ===`);
 
       return {
         success: true,
@@ -438,7 +470,11 @@ export class IntegrationService {
         data: response.data.contact
       };
     } catch (error: unknown) {
-      console.error('Erro ao buscar informações do contato no GHL:', error);
+      console.error(`❌ === ERRO GHL CONTATO ===`);
+      console.error(`❌ Erro:`, error);
+      console.error(`❌ Stack:`, error instanceof Error ? error.stack : 'N/A');
+      console.error(`❌ === FIM ERRO GHL ===`);
+      
       return {
         success: false,
         message: 'Erro ao buscar informações do contato no GHL',
