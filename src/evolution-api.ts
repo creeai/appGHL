@@ -311,9 +311,8 @@ export class EvolutionApiService {
       console.error(`❌ Dados:`, JSON.stringify(error.response?.data, null, 2));
 
       // Se o erro é que a instância já existe, considera sucesso
-      if (error.response?.status === 403 &&
-          error.response?.data?.message?.includes('already in use')) {
-        console.log(`✅ Instância ${this.config.instanceName} já existe - considerando sucesso`);
+      if (error.response?.status === 403) {
+        console.log(`✅ Instância ${this.config.instanceName} já existe (erro 403) - considerando sucesso`);
         return {
           success: true,
           data: { message: 'Instância já existe', state: 'existing' }

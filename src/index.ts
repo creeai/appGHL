@@ -474,6 +474,11 @@ app.post("/webhook/ghl",
       console.log("🔔 Body completo:", JSON.stringify(req.body, null, 2));
       console.log("🔔 === FIM LOGS WEBHOOK ===");
       
+      // LOG CRÍTICO PARA IDENTIFICAR VERSÃO
+      console.log("🚨 === VERIFICAÇÃO DE VERSÃO ===");
+      console.log("🚨 Se você vê esta mensagem, a versão atualizada está rodando!");
+      console.log("🚨 === FIM VERIFICAÇÃO ===");
+      
       const eventType = req.body.type;
       const { locationId, companyId, messageId } = req.body;
       
@@ -751,16 +756,19 @@ app.post("/webhook/ghl",
           error: error.message
         });
       }
-  } else if (eventType === 'InboundMessage') {
-      console.log("📥 Evento InboundMessage detectado - mensagem recebida");
+    } else if (eventType === 'InboundMessage') {
+      console.log("📥 === EVENTO INBOUNDMESSAGE DETECTADO ===");
       console.log("📥 Esta é uma mensagem que o usuário ENVIOU para o GHL");
       console.log("📥 Não precisamos processar - apenas log para debug");
+      console.log("📥 Payload completo:", JSON.stringify(req.body, null, 2));
       return res.status(200).json({ 
         success: true, 
         message: "Mensagem inbound recebida - não processada" 
       });
     } else {
-      console.log(`❓ Tipo de evento não suportado: ${eventType}`);
+      console.log(`❓ === TIPO DE EVENTO NÃO SUPORTADO ===`);
+      console.log(`❓ Evento: ${eventType}`);
+      console.log(`❓ Payload:`, JSON.stringify(req.body, null, 2));
     }
     
     console.log("=== WEBHOOK GHL PROCESSADO ===");
